@@ -81,21 +81,20 @@ CREATE TABLE Lote (
 	FOREIGN KEY (id_pedido) REFERENCES Pedido(id_pedido)
 );
 
-CREATE TABLE Venta (
-    id_venta INT PRIMARY KEY IDENTITY NOT NULL,
-    fecha_venta DATE,
-    estado_venta DATE,
+CREATE TABLE Compra (
+    id_compra INT PRIMARY KEY IDENTITY NOT NULL,
+    fecha_compra DATE,
     id_propietario INT NOT NULL,
     FOREIGN KEY (id_propietario) REFERENCES Propietario(id_propietario)
 );
 
-CREATE TABLE DetalleVenta (
-    id_detalle_venta INT PRIMARY KEY IDENTITY NOT NULL,
+CREATE TABLE DetalleCompra (
+    id_detalle_compra INT PRIMARY KEY IDENTITY NOT NULL,
     cantidad_producto INT NOT NULL,
 	valor_total MONEY,
-    id_venta INT NOT NULL,
+    id_compra INT NOT NULL,
     id_producto INT NOT NULL,
-    FOREIGN KEY (id_venta) REFERENCES Venta(id_venta),
+    FOREIGN KEY (id_compra) REFERENCES Compra(id_compra),
     FOREIGN KEY (id_producto) REFERENCES Producto(id_producto)
 );
 
