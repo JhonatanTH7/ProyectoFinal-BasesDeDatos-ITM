@@ -129,21 +129,32 @@ CREATE TABLE ClientePreferenteBelleza (
 CREATE TABLE TipoServicioBelleza (
     id_tipo_serviciobelleza INT PRIMARY KEY IDENTITY NOT NULL,
     nombre_tipo_serviciobelleza VARCHAR(100) NOT NULL,
-    personal_requerido VARCHAR(100) NOT NULL,
-    espacio_requerido VARCHAR(100) NOT NULL,
     descripcion VARCHAR(255) NULL,
     duracion_aprox_minutos INT NOT NULL
 );
 
+CREATE TABLE EmpleadoBelleza (
+    id_empleadobelleza INT PRIMARY KEY IDENTITY NOT NULL, 
+    nombre_empleadobelleza VARCHAR(100) NOT NULL,
+	numero_documento INT NOT NULL,
+);
+
+CREATE TABLE InstalaciónBelleza (
+	 id_instalacionbelleza INT PRIMARY KEY IDENTITY NOT NULL,
+	 nombre_instalacionguarderia VARCHAR(50) NOT NULL
+);
+
 CREATE TABLE ServicioBelleza (
     id_serviciobelleza INT PRIMARY KEY IDENTITY NOT NULL,
-    espacio_asignado VARCHAR(100) NOT NULL,
-    personal_asignado VARCHAR(100) NOT NULL,
     estado_serviciobelleza VARCHAR(20) NOT NULL CHECK (estado_serviciobelleza IN ('Realizado', 'Cancelado', 'Asignado')),
     id_tipo_serviciobelleza INT NOT NULL,
     id_citabelleza INT NOT NULL,
+	id_empleadobelleza INT NOT NULL,
+	id_instalacionbelleza INT NOT NULL,
     FOREIGN KEY (id_citabelleza) REFERENCES CitaBelleza (id_citabelleza),
-    FOREIGN KEY (id_tipo_serviciobelleza) REFERENCES TipoServicioBelleza (id_tipo_serviciobelleza)
+    FOREIGN KEY (id_tipo_serviciobelleza) REFERENCES TipoServicioBelleza (id_tipo_serviciobelleza),
+	FOREIGN KEY (id_empleadobelleza) REFERENCES EmpleadoBelleza(id_empleadobelleza),
+	FOREIGN KEY (id_instalacionbelleza) REFERENCES InstalaciónBelleza(id_instalacionbelleza)
 );
 
 
@@ -629,15 +640,77 @@ VALUES
 ('2024-09-26 09:30:00', '2024-09-29 09:30:00', 3, 'Dieta especial sin carnes', 30, 34, 40);
 
 -- REGISTROS TIPO DE SERVICIOS DEL SALON DE BELLEZA 
-INSERT INTO TipoServicioBelleza (nombre_tipo_serviciobelleza, personal_requerido, espacio_requerido, descripcion, duracion_aprox_minutos)
+INSERT INTO TipoServicioBelleza (nombre_tipo_serviciobelleza, descripcion, duracion_aprox_minutos)
 VALUES 
-('Peluquería', '1 estilista', 'Sala de peluquería', 'Corte y arreglo de pelaje', 60),
-('Baño normal', '1 asistente', 'Área de baño', 'Baño básico con shampoo suave', 30),
-('Baño medicado', '1 asistente', 'Área de baño', 'Baño con productos médicos especializados', 45),
-('Drenaje de glándulas perianales', '1 asistente', 'Sala de procedimientos', 'Drenaje manual', 20),
-('Corte de uñas', '1 asistente', 'Zona de atención rápida', 'Corte de uñas de rutina', 15),
-('Limpieza de oídos', '1 asistente', 'Zona de atención rápida', 'Limpieza con solución especial', 15),
-('Limpieza de dientes', '1 asistente', 'Zona de atención rápida', 'Limpieza dental básica', 20);
+('Peluquería', 'Corte y arreglo de pelaje', 60),
+('Baño normal', 'Baño básico con shampoo suave', 30),
+('Baño medicado', 'Baño con productos médicos especializados', 45),
+('Drenaje de glándulas perianales', 'Drenaje manual', 20),
+('Corte de uñas', 'Corte de uñas de rutina', 15),
+('Limpieza de oídos', 'Limpieza con solución especial', 15),
+('Limpieza de dientes', 'Limpieza dental básica', 20);
+
+-- REGISTROS EMPLEADOS DEL SALON DE BELLEZA
+INSERT INTO EmpleadoBelleza (nombre_empleadobelleza, numero_documento)
+VALUES 
+('Carlos Martínez', 1012345678),
+('María Pérez', 1023456789),
+('Juan Gómez', 1034567890),
+('Laura González', 1045678901),
+('Luis Ramírez', 1056789012),
+('Ana López', 1067890123),
+('Pedro Rodríguez', 1078901234),
+('Marta Jiménez', 1089012345),
+('Sofía Torres', 1090123456),
+('Diego Sánchez', 1101234567),
+('Camila Díaz', 1112345678),
+('Andrés Moreno', 1123456789),
+('Paula Muñoz', 1134567890),
+('Javier Castillo', 1145678901),
+('Gabriela Ortiz', 1156789012),
+('Sebastián Rivas', 1167890123),
+('Fernanda Reyes', 1178901234),
+('Daniela Castro', 1189012345),
+('Manuel Vargas', 1190123456),
+('Adriana Ruiz', 1201234567),
+('Nicolás Espinosa', 1212345678),
+('Valentina Pardo', 1223456789),
+('Felipe Valencia', 1234567890),
+('Diana Mendoza', 1245678901),
+('Ángela Figueroa', 1256789012),
+('Miguel Romero', 1267890123),
+('Sara Prieto', 1278901234),
+('Ricardo Peña', 1289012345),
+('Carolina Cardozo', 1290123456),
+('Jorge Vera', 1301234567),
+('Alejandra Herrera', 1312345678),
+('David Niño', 1323456789),
+('Claudia Beltrán', 1334567890),
+('Tomás Cárdenas', 1345678901),
+('Santiago Ramírez', 1356789012),
+('Lucía Zambrano', 1367890123),
+('Esteban Serrano', 1378901234),
+('Natalia Bernal', 1389012345),
+('Gustavo Pineda', 1390123456),
+('Carmen Parra', 1401234567),
+('Pablo Guevara', 1412345678),
+('Elena Porras', 1423456789),
+('Rafael Suárez', 1434567890),
+('Yolanda Giraldo', 1445678901),
+('José Mejía', 1456789012),
+('César Medina', 1467890123),
+('Teresa Acosta', 1478901234),
+('Victoria Quintero', 1489012345),
+('Alberto Becerra', 1490123456),
+('Rosa Delgadillo', 1501234567),
+('Julio Vargas', 1512345678);
+
+-- REGISTROS INSTALACIONES DEL SALON DE BELLEZA
+INSERT INTO InstalaciónBelleza (nombre_instalacionguarderia)
+VALUES
+(1),(2),
+( 3),(4);
+
 
 -- REGISTROS CITAS DEL SALON DE BELLEZA
 INSERT INTO CitaBelleza (fecha, hora_inicio, hora_aprox_fin, estado, id_mascota)
@@ -694,58 +767,58 @@ VALUES
 ('2024-12-20', '13:00', '14:00', 'Cancelada', 90);
 
 -- REGISTROS SERVICIOS PRESTADOS DEL SALON DE BELLEZA
-INSERT INTO ServicioBelleza (espacio_asignado, personal_asignado, estado_serviciobelleza, id_tipo_serviciobelleza, id_citabelleza)
+INSERT INTO ServicioBelleza(id_instalacionbelleza, id_empleadobelleza, estado_serviciobelleza, id_tipo_serviciobelleza, id_citabelleza)
 VALUES 
-('Sala de peluquería', 'Juan Pérez', 'Cancelado', 1, 1),
-('Área de baño', 'Ana Gómez', 'Realizado', 2, 2),
-('Área de baño', 'Luis Martínez', 'Realizado', 3, 3),
-('Sala de peluquería', 'María López', 'Realizado', 1, 4),
-('Área de baño', 'Carlos Ruiz', 'Realizado', 2, 5),
-('Área de baño', 'Laura Sánchez', 'Realizado', 3, 6),
-('Sala de peluquería', 'Pedro Torres', 'Realizado', 1, 7),
-('Área de baño', 'Sofía Ramírez', 'Realizado', 2, 8),
-('Área de baño', 'Miguel Díaz', 'Realizado', 3, 9),
-('Sala de peluquería', 'Lucía Fernández', 'Realizado', 1, 10),
-('Área de baño', 'Jorge Morales', 'Realizado', 2, 11),
-('Área de baño', 'Elena García', 'Realizado', 3, 12),
-('Sala de peluquería', 'Raúl Jiménez', 'Realizado', 1, 13),
-('Área de baño', 'Isabel Ortiz', 'Asignado', 2, 14),
-('Sala de procedimientos', 'Diego Vega', 'Asignado', 4, 15),
-('Sala de peluquería', 'Patricia Herrera', 'Asignado', 1, 16),
-('Zona de atención rápida', 'Fernando Castro', 'Asignado', 6, 17),
-('Zona de atención rápida', 'Gabriela Rojas', 'Asignado', 7, 18),
-('Sala de peluquería', 'Ricardo Mendoza', 'Asignado', 1, 19),
-('Sala de procedimientos', 'Valeria Flores', 'Asignado', 4, 20),
-('Zona de atención rápida', 'Andrés Navarro', 'Asignado', 5, 21),
-('Sala de peluquería', 'Natalia Reyes', 'Asignado', 1, 22),
-('Zona de atención rápida', 'Santiago Paredes', 'Asignado', 6, 23),
-('Área de baño', 'Daniela Peña', 'Asignado', 3, 24),
-('Sala de procedimientos', 'Hugo Salazar', 'Asignado', 4, 25),
-('Zona de atención rápida', 'Claudia Vargas', 'Asignado', 7, 26),
-('Área de baño', 'Alberto Romero', 'Asignado', 3, 27),
-('Sala de peluquería', 'Mónica Castillo', 'Asignado', 1, 28),
-('Área de baño', 'Francisco Guzmán', 'Asignado', 2, 29),
-('Zona de atención rápida', 'Rosa Aguilar', 'Asignado', 5, 30),
-('Sala de peluquería', 'Esteban Silva', 'Asignado', 1, 31),
-('Área de baño', 'Paula Campos', 'Asignado', 2, 32),
-('Zona de atención rápida', 'Javier Soto', 'Asignado', 7, 33),
-('Sala de procedimientos', 'Javier Soto', 'Asignado', 4, 34),
-('Área de baño', 'Javier Soto', 'Asignado', 3, 35),
-('Zona de atención rápida', 'Javier Soto', 'Asignado', 7, 36),
-('Sala de procedimientos', 'Javier Soto', 'Asignado', 4, 37),
-('Área de baño', 'Javier Soto', 'Asignado', 3, 38),
-('Zona de atención rápida', 'Javier Soto', 'Asignado', 6, 39),
-('Área de baño', 'Javier Soto', 'Asignado', 3, 40),
-('Zona de atención rápida', 'Javier Soto', 'Asignado', 5, 41),
-('Área de baño', 'Javier Soto', 'Asignado', 2, 42),
-('Sala de procedimientos', 'Javier Soto', 'Asignado', 4, 43),
-('Zona de atención rápida', 'Javier Soto', 'Asignado', 6, 44),
-('Área de baño', 'Javier Soto', 'Asignado', 3, 45),
-('Sala de procedimientos', 'Javier Soto', 'Asignado', 4, 46),
-('Zona de atención rápida', 'Javier Soto', 'Asignado', 6, 47),
-('Zona de atención rápida', 'Javier Soto', 'Asignado', 5, 48),
-('Zona de atención rápida', 'Javier Soto', 'Asignado', 6, 49),
-('Zona de atención rápida', 'Javier Soto', 'Cancelado', 5, 50);
+(1, 1, 'Cancelado', 1, 1),
+(2, 2, 'Realizado', 2, 2),
+(2, 3, 'Realizado', 3, 3),
+(1, 4, 'Realizado', 1, 4),
+(2, 5, 'Realizado', 2, 5),
+(2, 6, 'Realizado', 3, 6),
+(1, 7, 'Realizado', 1, 7),
+(2, 8, 'Realizado', 2, 8),
+(2, 9, 'Realizado', 3, 9),
+(1, 10, 'Realizado', 1, 10),
+(2, 11, 'Realizado', 2, 11),
+(2, 12, 'Realizado', 3, 12),
+(1, 13, 'Realizado', 1, 13),
+(2, 14, 'Asignado', 2, 14),
+(3, 15, 'Asignado', 4, 15),
+(1, 16, 'Asignado', 1, 16),
+(4, 17, 'Asignado', 6, 17),
+(4, 18, 'Asignado', 7, 18),
+(1, 19, 'Asignado', 1, 19),
+(3, 20, 'Asignado', 4, 20),
+(4, 21, 'Asignado', 5, 21),
+(1, 22, 'Asignado', 1, 22),
+(4, 23, 'Asignado', 6, 23),
+(2, 24, 'Asignado', 3, 24),
+(3, 25, 'Asignado', 4, 25),
+(4, 26, 'Asignado', 7, 26),
+(2, 27, 'Asignado', 3, 27),
+(1, 28, 'Asignado', 1, 28),
+(2, 29, 'Asignado', 2, 29),
+(4, 30, 'Asignado', 5, 30),
+(1, 31, 'Asignado', 1, 31),
+(2, 32, 'Asignado', 2, 32),
+(4, 33, 'Asignado', 7, 33),
+(3, 34, 'Asignado', 4, 34),
+(2, 35, 'Asignado', 3, 35),
+(4, 36, 'Asignado', 7, 36),
+(3, 37, 'Asignado', 4, 37),
+(2, 38, 'Asignado', 3, 38),
+(4, 39, 'Asignado', 6, 39),
+(2, 40, 'Asignado', 3, 40),
+(4, 42, 'Asignado', 5, 41),
+(2, 43, 'Asignado', 2, 42),
+(3, 44, 'Asignado', 4, 43),
+(4, 45, 'Asignado', 6, 44),
+(2, 46, 'Asignado', 3, 45),
+(3, 47, 'Asignado', 4, 46),
+(4, 48, 'Asignado', 6, 47),
+(4, 49, 'Asignado', 5, 48),
+(4, 50, 'Asignado', 6, 49),
+(4, 51, 'Cancelado', 5, 50);
 
 
 SELECT * FROM Propietario;
@@ -756,8 +829,10 @@ SELECT * FROM Cargo;
 SELECT * FROM EstanciaGuarderia;
 SELECT * FROM EmpleadoGuarderia;
 SELECT * FROM TipoServicioBelleza;
+SELECT * FROM EmpleadoBelleza;
+SELECT * FROM InstalaciónBelleza;
 SELECT * FROM CitaBelleza;
-SELECT *FROM ServicioBelleza;
+SELECT * FROM ServicioBelleza;
 
 
 ---------------------------------------------------------------------------------------------------------------------------
