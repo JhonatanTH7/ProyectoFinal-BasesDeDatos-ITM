@@ -48,8 +48,16 @@ CREATE TABLE Pedido (
     fecha_pedido DATE,
     estado_pedido VARCHAR(50) CHECK(estado_pedido IN ('En Proceso', 'Cancelado', 'Recibido')),
 	valor_pedido MONEY,
-	id_proveedor INT NOT NULL,
+	id_proveedor INT,
 	FOREIGN KEY (id_proveedor) REFERENCES ProveedorTienda(id_proveedor)
+);
+
+CREATE TABLE Lote (
+    id_lote INT PRIMARY KEY IDENTITY NOT NULL,
+	cantidad_producto_pedido INT NOT NULL,
+    fecha_vencimiento DATE,
+    id_pedido INT NOT NULL,
+	FOREIGN KEY (id_pedido) REFERENCES Pedido(id_pedido)
 );
 
 CREATE TABLE Producto (
@@ -60,16 +68,8 @@ CREATE TABLE Producto (
     tamaño_recomendado VARCHAR(20),
     Stock INT NOT NULL,
     precio_unitario MONEY,
-);
-
-CREATE TABLE Lote (
-    id_lote INT PRIMARY KEY IDENTITY NOT NULL,
-	cantidad_producto_pedido INT NOT NULL,
-    fecha_vencimiento DATE,
-	id_producto INT NOT NULL,
-    id_pedido INT NOT NULL,
-    FOREIGN KEY (id_producto) REFERENCES Producto(id_producto),
-	FOREIGN KEY (id_pedido) REFERENCES Pedido(id_pedido)
+    id_lote INT NOT NULL,
+	FOREIGN KEY (id_lote) REFERENCES Lote(id_lote),
 );
 
 CREATE TABLE Compra (
@@ -149,7 +149,7 @@ CREATE TABLE Cargo (
 CREATE TABLE EmpleadoGuarderia (
     id_empleadoguarderia INT PRIMARY KEY IDENTITY NOT NULL, 
     nombre_empleadoguarderia VARCHAR(100) NOT NULL,
-    id_cargo INT NOT NULL,
+    id_cargo INT,
 	FOREIGN KEY (id_cargo) REFERENCES Cargo(id_cargo)
 );
 
@@ -261,7 +261,6 @@ CREATE TABLE ProveedorClinica (
 CREATE TABLE Insumo (
     id_insumo INT PRIMARY KEY IDENTITY NOT NULL,
     nombre_insumo VARCHAR(100) NOT NULL,
-    cantidad_inicial INT NOT NULL,
     stock_actual INT NOT NULL,
     fecha_vencimiento DATE NOT NULL,
     temperatura_almacenamiento DECIMAL(5,2),
@@ -274,7 +273,6 @@ CREATE TABLE UsoInsumo (
     id_usoinsumo INT PRIMARY KEY IDENTITY NOT NULL,
     fecha_registro DATE DEFAULT GETDATE(),
     cantidad_usada INT NOT NULL,
-    cantidad_restante INT NOT NULL,
     id_insumo INT NOT NULL,
     id_atencionmedica_serviciomedico INT NOT NULL,
     FOREIGN KEY (id_insumo) REFERENCES Insumo(id_insumo),
@@ -347,7 +345,7 @@ VALUES
 -- REGISTROS TIPO DE FAUNA
 INSERT INTO TipoFauna (nombre_fauna)
 VALUES 
-('Silvestre'),('Doméstica');
+('Silvestre'),('Domestica');
 
 --  REGISTROS ESPECIES
 INSERT INTO Especie(nombre_especie)
@@ -454,7 +452,8 @@ VALUES
 ('Holly', 'M086', 2, 12, 7),
 ('Ace', 'M087', 2, 12, 8),
 ('Cleo', 'M088', 2, 11, 9),
-('Hunter', 'M089', 2, 11, 10);
+('Hunter', 'M089', 2, 11, 10),
+('Prueba', 'M090', 2, 12, 5);
 
 --	REGISTROS CARGOS (GUARDERIA)
 INSERT INTO Cargo (nombre_cargo)
@@ -730,7 +729,8 @@ VALUES
 ('2024-12-17', '10:00', '11:00', 'Asignada', 87),
 ('2024-12-18', '11:00', '12:00', 'Asignada', 88),
 ('2024-12-19', '12:00', '13:00', 'Asignada', 89),
-('2024-12-20', '13:00', '14:00', 'Cancelada', 90);
+('2024-12-20', '13:00', '14:00', 'Cancelada', 90),
+('2024-12-21', '13:00', '14:00', 'Asignada', 90);
 
 -- REGISTROS CLIENTES PREFERENTES DEL SALON DE BELLEZA 
 INSERT INTO ClientePreferenteBelleza(fecha_registro,motivo,id_propietario) VALUES ('2024-10-05','Cliente frecuente',1);
@@ -916,93 +916,93 @@ VALUES
 ('2024-07-20', 'Recibido', 170000, 39),
 ('2024-07-25', 'Recibido', 90000, 40);
 
--- REGISTROS PRODUCTOS DE LA TIENDA DE MASCOTAS
-INSERT INTO Producto (nombre_producto, tipo_producto, edad_recomendada, tamaño_recomendado, Stock, precio_unitario)
-VALUES 
-('Alimento para perros', 'Alimento', 'Adulto', 'Grande', 100, 25000),
-('Juguete para gatos', 'Accesorio', 'Cachorro', 'Pequeño', 100, 15000),
-('Cama para perros', 'Accesorio', 'Adulto', 'Grande', 100, 80000),
-('Cepillo para gatos', 'Accesorio', 'Adulto', 'Mediano', 100, 20000),
-('Correa para perros', 'Accesorio', 'Cachorro', 'Mediano', 100, 18000),
-('Alimento para gatos', 'Alimento', 'Adulto', 'Pequeño', 100, 27000),
-('Comedero para perros', 'Accesorio', 'Cachorro', 'Grande', 100, 30000),
-('Juguete para perros', 'Accesorio', 'Adulto', 'Mediano', 100, 12000),
-('Rascador para gatos', 'Accesorio', 'Cachorro', 'Grande', 100, 45000),
-('Alimento para aves', 'Alimento', 'Adulto', 'Pequeño', 100, 10000),
-('Collar para gatos', 'Accesorio', 'Adulto', 'Pequeño', 100, 15000),
-('Casa para perros', 'Accesorio', 'Adulto', 'Grande', 100, 120000),
-('Cepillo para perros', 'Accesorio', 'Adulto', 'Mediano', 100, 25000),
-('Arenero para gatos', 'Accesorio', 'Adulto', 'Mediano', 100, 30000),
-('Correa retráctil', 'Accesorio', 'Cachorro', 'Mediano', 100, 22000),
-('Alimento para peces', 'Alimento', 'Adulto', 'Pequeño', 100, 8000),
-('Arena para gatos', 'Alimento', 'Adulto', 'Mediano', 100, 20000),
-('Jaula para aves', 'Accesorio', 'Adulto', 'Grande', 100, 60000),
-('Ropa para perros', 'Accesorio', 'Cachorro', 'Pequeño', 100, 20000),
-('Snack para perros', 'Alimento', 'Adulto', 'Pequeño', 100, 12000),
-('Collar con placas', 'accesorio', 'todas las edades', 'mediano', 100, 5000),
-('Bolsa de croquetas para gatos', 'alimento', 'adulto', 'pequeño', 100, 12000),
-('Jaula para aves', 'accesorio', 'todas las edades', 'grande', 100, 80000),
-('Juguete interactivo', 'juguete', 'cachorro', 'pequeño', 100, 20000),
-('Peluche para perros', 'juguete', 'adulto', 'mediano', 100, 22000),
-('Suplemento vitamínico', 'medicina', 'adulto', 'pequeño', 100, 18000),
-('Rascador para gatos', 'accesorio', 'todas las edades', 'grande', 100, 55000),
-('Arena para gatos', 'accesorio', 'todas las edades', 'pequeño', 100, 10000),
-('Cepillo para pelaje', 'accesorio', 'todas las edades', 'mediano', 100, 15000),
-('Juguete de cuerda', 'juguete', 'adulto', 'mediano', 100, 7000),
-('Shampoo antipulgas', 'medicina', 'todas las edades', 'mediano', 100, 35000),
-('Pipeta para pulgas', 'medicina', 'adulto', 'pequeño', 100, 14000),
-('Comedero interactivo', 'accesorio', 'todas las edades', 'grande', 100, 40000),
-('Collar luminoso', 'accesorio', 'adulto', 'pequeño', 100, 17000),
-('Transportadora pequeña', 'accesorio', 'cachorro', 'pequeño', 100, 90000),
-('Golosinas para perros', 'alimento', 'todas las edades', 'pequeño', 100, 8000),
-('Bebedero automático', 'accesorio', 'adulto', 'mediano', 100, 45000),
-('Jaula para perros', 'accesorio', 'adulto', 'grande', 100, 120000),
-('Manta térmica', 'accesorio', 'adulto', 'mediano', 100, 25000),
-('Cama ortopédica', 'accesorio', 'adulto', 'grande', 100, 100000);
-
 -- REGISTROS LOTES DE PRODUCTOS DE LA TIENDA DE MASCOTAS
-INSERT INTO Lote (cantidad_producto_pedido, fecha_vencimiento, id_producto, id_pedido)
+INSERT INTO Lote (cantidad_producto_pedido, fecha_vencimiento, id_pedido)
 VALUES 
-(200, '2025-10-15', 1, 1),   
-(200, '2025-09-20', 2, 2),   
-(200, '2025-10-01', 3, 3),   
-(200, '2025-08-15', 4, 4),   
-(200, '2025-09-10', 5, 5),  
-(200, '2025-07-25', 6, 6),  
-(200, '2025-10-05', 7, 7),  
-(200, '2025-06-20', 8, 8),  
-(200, '2025-08-15', 9, 9),  
-(200, '2025-09-05', 10, 10), 
-(200, '2025-07-10', 11, 11),  
-(200, '2025-06-18', 12, 12),  
-(200, '2025-09-22', 13, 13),  
-(200, '2025-07-05', 14, 14),  
-(200, '2025-08-12', 15, 15), 
-(200, '2025-06-10', 16, 16),  
-(200, '2025-08-01', 17, 17),  
-(200, '2025-09-28', 18, 18), 
-(200, '2025-07-05', 19, 19), 
-(200, '2025-06-30', 20, 20), 
-(200, '2025-08-15', 21, 21), 
-(200, '2025-09-01', 22, 22), 
-(200, '2025-10-25', 23, 23),  
-(200, '2025-09-10', 24, 24),   
-(200, '2025-08-19', 25, 25),  
-(200, '2025-10-09', 26, 26), 
-(200, '2025-09-27', 27, 27),  
-(200, '2025-07-10', 28, 28),  
-(200, '2025-08-15', 29, 29),  
-(200, '2025-06-20', 30, 30), 
-(200, '2025-07-25', 31, 31), 
-(200, '2025-09-01', 32, 32), 
-(200, '2025-08-12', 33, 33), 
-(200, '2025-06-15', 34, 34),   
-(200, '2025-10-08', 35, 35),  
-(200, '2025-09-21', 36, 36),  
-(200, '2025-08-17', 37, 37), 
-(200, '2025-07-20', 38, 38), 
-(200, '2025-08-30', 39, 39),  
-(200, '2025-06-25', 40, 40);
+(200, '2025-10-15', 1),   
+(200, '2025-09-20', 2),   
+(200, '2025-10-01', 3),   
+(200, '2025-08-15', 4),   
+(200, '2025-09-10', 5),  
+(200, '2025-07-25', 6),  
+(200, '2025-10-05', 7),  
+(200, '2025-06-20', 8),  
+(200, '2025-08-15', 9),  
+(200, '2025-09-05', 10), 
+(200, '2025-07-10', 11),  
+(200, '2025-06-18', 12),  
+(200, '2025-09-22', 13),  
+(200, '2025-07-05', 14),  
+(200, '2025-08-12', 15), 
+(200, '2025-06-10', 16),  
+(200, '2025-08-01', 17),  
+(200, '2025-09-28', 18), 
+(200, '2025-07-05', 19), 
+(200, '2025-06-30', 20), 
+(200, '2025-08-15', 21), 
+(200, '2025-09-01', 22), 
+(200, '2025-10-25', 23),  
+(200, '2025-09-10', 24),   
+(200, '2025-08-19', 25),  
+(200, '2025-10-09', 26), 
+(200, '2025-09-27', 27),  
+(200, '2025-07-10', 28),  
+(200, '2025-08-15', 29),  
+(200, '2025-06-20', 30), 
+(200, '2025-07-25', 31), 
+(200, '2025-09-01', 32), 
+(200, '2025-08-12', 33), 
+(200, '2025-06-15', 34),   
+(200, '2025-10-08', 35),  
+(200, '2025-09-21', 36),  
+(200, '2025-08-17', 37), 
+(200, '2025-07-20', 38), 
+(200, '2025-08-30', 39),  
+(200, '2025-06-25', 40);
+
+-- REGISTROS PRODUCTOS DE LA TIENDA DE MASCOTAS
+INSERT INTO Producto(nombre_producto, tipo_producto, edad_recomendada, tamaño_recomendado, Stock, precio_unitario, id_lote) VALUES ('Alimento para perros','Alimento','Adulto', 'Grande',100,25000,1);
+INSERT INTO Producto(nombre_producto, tipo_producto, edad_recomendada, tamaño_recomendado, Stock, precio_unitario, id_lote) VALUES ('Juguete para gatos','Accesorio','Cachorro', 'Pequeño',100,15000,2);
+INSERT INTO Producto(nombre_producto, tipo_producto, edad_recomendada, tamaño_recomendado, Stock, precio_unitario, id_lote) VALUES ('Cama para perros','Accesorio','Adulto', 'Grande',100,80000,3);
+INSERT INTO Producto(nombre_producto, tipo_producto, edad_recomendada, tamaño_recomendado, Stock, precio_unitario, id_lote) VALUES ('Cepillo para gatos','Accesorio','Adulto', 'Mediano',100,20000,4);
+INSERT INTO Producto(nombre_producto, tipo_producto, edad_recomendada, tamaño_recomendado, Stock, precio_unitario, id_lote) VALUES ('Correa para perros','Accesorio','Cachorro', 'Mediano',100,18000,5);
+INSERT INTO Producto(nombre_producto, tipo_producto, edad_recomendada, tamaño_recomendado, Stock, precio_unitario, id_lote) VALUES ('Alimento para gatos','Alimento','Adulto', 'Pequeño',100,27000,6);
+INSERT INTO Producto(nombre_producto, tipo_producto, edad_recomendada, tamaño_recomendado, Stock, precio_unitario, id_lote) VALUES ('Comedero para perros','Accesorio','Cachorro', 'Grande',100,30000,7);
+INSERT INTO Producto(nombre_producto, tipo_producto, edad_recomendada, tamaño_recomendado, Stock, precio_unitario, id_lote) VALUES ('Juguete para perros','Accesorio','Adulto', 'Mediano',100,12000,8);
+INSERT INTO Producto(nombre_producto, tipo_producto, edad_recomendada, tamaño_recomendado, Stock, precio_unitario, id_lote) VALUES ('Rascador para gatos','Accesorio','Cachorro', 'Grande',100,45000,9);
+INSERT INTO Producto(nombre_producto, tipo_producto, edad_recomendada, tamaño_recomendado, Stock, precio_unitario, id_lote) VALUES ('Alimento para aves','Alimento','Adulto', 'Pequeño',100,10000,10);
+INSERT INTO Producto(nombre_producto, tipo_producto, edad_recomendada, tamaño_recomendado, Stock, precio_unitario, id_lote) VALUES ('Collar para gatos','Accesorio','Adulto', 'Pequeño',100,15000,11);
+INSERT INTO Producto(nombre_producto, tipo_producto, edad_recomendada, tamaño_recomendado, Stock, precio_unitario, id_lote) VALUES ('Casa para perros','Accesorio','Adulto', 'Grande',100,120000,12);
+INSERT INTO Producto(nombre_producto, tipo_producto, edad_recomendada, tamaño_recomendado, Stock, precio_unitario, id_lote) VALUES ('Cepillo para perros','Accesorio','Adulto', 'Mediano',100,25000,13);
+INSERT INTO Producto(nombre_producto, tipo_producto, edad_recomendada, tamaño_recomendado, Stock, precio_unitario, id_lote) VALUES ('Arenero para gatos','Accesorio','Adulto', 'Mediano',100,30000,14);
+INSERT INTO Producto(nombre_producto, tipo_producto, edad_recomendada, tamaño_recomendado, Stock, precio_unitario, id_lote) VALUES ('Correa retráctil','Accesorio','Cachorro', 'Mediano',100,22000,15);
+INSERT INTO Producto(nombre_producto, tipo_producto, edad_recomendada, tamaño_recomendado, Stock, precio_unitario, id_lote) VALUES ('Alimento para peces','Alimento','Adulto', 'Pequeño',100,8000,16);
+INSERT INTO Producto(nombre_producto, tipo_producto, edad_recomendada, tamaño_recomendado, Stock, precio_unitario, id_lote) VALUES ('Arena para gatos','Alimento','Adulto', 'Mediano',100,20000,17);
+INSERT INTO Producto(nombre_producto, tipo_producto, edad_recomendada, tamaño_recomendado, Stock, precio_unitario, id_lote) VALUES ('Jaula para aves','Accesorio','Adulto', 'Grande',100,60000,18);
+INSERT INTO Producto(nombre_producto, tipo_producto, edad_recomendada, tamaño_recomendado, Stock, precio_unitario, id_lote) VALUES ('Ropa para perros','Accesorio','Cachorro', 'Pequeño',100,20000,19);
+INSERT INTO Producto(nombre_producto, tipo_producto, edad_recomendada, tamaño_recomendado, Stock, precio_unitario, id_lote) VALUES ('Snack para perros','Alimento','Adulto', 'Pequeño',100,12000,20);
+INSERT INTO Producto(nombre_producto, tipo_producto, edad_recomendada, tamaño_recomendado, Stock, precio_unitario, id_lote) VALUES ('Collar con placas','accesorio','todas las edades', 'mediano',100,5000,21);
+INSERT INTO Producto(nombre_producto, tipo_producto, edad_recomendada, tamaño_recomendado, Stock, precio_unitario, id_lote) VALUES ('Bolsa de croquetas para gatos','alimento','adulto', 'pequeño',100,12000,22);
+INSERT INTO Producto(nombre_producto, tipo_producto, edad_recomendada, tamaño_recomendado, Stock, precio_unitario, id_lote) VALUES ('Jaula para aves','accesorio','todas las edades', 'grande',100,80000,23);
+INSERT INTO Producto(nombre_producto, tipo_producto, edad_recomendada, tamaño_recomendado, Stock, precio_unitario, id_lote) VALUES ('Juguete interactivo','juguete','cachorro', 'pequeño',100,20000,24);
+INSERT INTO Producto(nombre_producto, tipo_producto, edad_recomendada, tamaño_recomendado, Stock, precio_unitario, id_lote) VALUES ('Peluche para perros','juguete','adulto', 'mediano',100,22000,25);
+INSERT INTO Producto(nombre_producto, tipo_producto, edad_recomendada, tamaño_recomendado, Stock, precio_unitario, id_lote) VALUES ('Suplemento vitamínico','medicina','adulto', 'pequeño',100,18000,26);
+INSERT INTO Producto(nombre_producto, tipo_producto, edad_recomendada, tamaño_recomendado, Stock, precio_unitario, id_lote) VALUES ('Rascador para gatos','accesorio','todas las edades', 'grande',100,55000,27);
+INSERT INTO Producto(nombre_producto, tipo_producto, edad_recomendada, tamaño_recomendado, Stock, precio_unitario, id_lote) VALUES ('Arena para gatos','accesorio','todas las edades', 'pequeño',100,10000,28);
+INSERT INTO Producto(nombre_producto, tipo_producto, edad_recomendada, tamaño_recomendado, Stock, precio_unitario, id_lote) VALUES ('Cepillo para pelaje','accesorio','todas las edades', 'mediano',100,15000,29);
+INSERT INTO Producto(nombre_producto, tipo_producto, edad_recomendada, tamaño_recomendado, Stock, precio_unitario, id_lote) VALUES ('Juguete de cuerda','juguete','adulto', 'mediano',100,7000,30);
+INSERT INTO Producto(nombre_producto, tipo_producto, edad_recomendada, tamaño_recomendado, Stock, precio_unitario, id_lote) VALUES ('Shampoo antipulgas','medicina','todas las edades', 'mediano',100,35000,31);
+INSERT INTO Producto(nombre_producto, tipo_producto, edad_recomendada, tamaño_recomendado, Stock, precio_unitario, id_lote) VALUES ('Pipeta para pulgas','medicina','adulto', 'pequeño',100,14000,32);
+INSERT INTO Producto(nombre_producto, tipo_producto, edad_recomendada, tamaño_recomendado, Stock, precio_unitario, id_lote) VALUES ('Comedero interactivo','accesorio','todas las edades', 'grande',100,40000,33);
+INSERT INTO Producto(nombre_producto, tipo_producto, edad_recomendada, tamaño_recomendado, Stock, precio_unitario, id_lote) VALUES ('Collar luminoso','accesorio','adulto', 'pequeño',100,17000,34);
+INSERT INTO Producto(nombre_producto, tipo_producto, edad_recomendada, tamaño_recomendado, Stock, precio_unitario, id_lote) VALUES ('Transportadora pequeña','accesorio','cachorro', 'pequeño',100,90000,35);
+INSERT INTO Producto(nombre_producto, tipo_producto, edad_recomendada, tamaño_recomendado, Stock, precio_unitario, id_lote) VALUES ('Golosinas para perros','alimento','todas las edades', 'pequeño',100,8000,36);
+INSERT INTO Producto(nombre_producto, tipo_producto, edad_recomendada, tamaño_recomendado, Stock, precio_unitario, id_lote) VALUES ('Bebedero automático','accesorio','adulto', 'mediano',100,45000,37);
+INSERT INTO Producto(nombre_producto, tipo_producto, edad_recomendada, tamaño_recomendado, Stock, precio_unitario, id_lote) VALUES ('Jaula para perros','accesorio','adulto', 'grande',100,120000,38);
+INSERT INTO Producto(nombre_producto, tipo_producto, edad_recomendada, tamaño_recomendado, Stock, precio_unitario, id_lote) VALUES ('Manta térmica','accesorio','adulto', 'mediano',100,25000,39);
+INSERT INTO Producto(nombre_producto, tipo_producto, edad_recomendada, tamaño_recomendado, Stock, precio_unitario, id_lote) VALUES ('Cama ortopédica','accesorio','adulto', 'grande',100,100000,40);
+
+
 
 -- REGISTROS COMPRAS DE CLIENTES EN LA TIENDA DE MASCOTAS
 INSERT INTO Compra (fecha_compra, id_propietario, valor_total_compra)
@@ -1382,95 +1382,94 @@ INSERT INTO ProveedorClinica(nombre_proveedor, telefono, direccion) VALUES ('Pro
 INSERT INTO ProveedorClinica(nombre_proveedor, telefono, direccion) VALUES ('Proveedor 40','84446194','Cra a ninguna parte 40');
 
 -- REGISTROS DE INSUMOS DE LA CLINICA VETERINARIA
-INSERT INTO Insumo (nombre_insumo, cantidad_inicial, stock_actual, fecha_vencimiento, temperatura_almacenamiento, tiempo_rotacion, id_proveedor)
+INSERT INTO Insumo (nombre_insumo, stock_actual, fecha_vencimiento, temperatura_almacenamiento, tiempo_rotacion, id_proveedor)
 VALUES
-('Reactivo Hemograma', 100, 80, '2025-01-15', 2.00, '00:30:00', 1),
-('Reactivo Perfil Bioquímico', 200, 180, '2025-02-20', 4.00, '01:00:00', 2),
-('Tubo para Hemograma', 500, 450, '2024-12-01', NULL, NULL, 3),
-('Tubo para Bioquímico', 300, 270, '2025-01-25', NULL, NULL, 4),
-('Contenedor para Urianálisis', 400, 350, '2025-04-10', NULL, NULL, 5),
-('Papel Radiográfico', 250, 200, '2025-05-15', 20.00, NULL, 6),
-('Gel para Ultrasonido', 100, 90, '2025-07-01', 15.00, NULL, 7),
-('Líquido de Contraste', 50, 40, '2025-03-05', 8.00, '01:30:00', 8),
-('Lentes de Protección', 150, 120, '2026-01-01', NULL, NULL, 9),
-('Protector de Plomo', 20, 18, '2027-12-01', NULL, NULL, 10),
-('Guantes Quirúrgicos', 1000, 900, '2024-11-20', NULL, NULL, 11),
-('Gasa Estéril', 800, 700, '2025-06-15', NULL, NULL, 12),
-('Sutura Absorbible', 300, 250, '2025-08-10', NULL, '02:00:00', 13),
-('Anestésico General', 60, 50, '2025-09-01', 5.00, '00:30:00', 14),
-('Antibiótico Intravenoso', 150, 130, '2025-02-25', 4.00, NULL, 15),
-('Banda Elástica', 100, 85, '2025-07-15', NULL, NULL, 16),
-('Gel Antiinflamatorio', 200, 180, '2025-06-30', 22.00, NULL, 17),
-('Electrodos', 120, 100, '2025-08-20', NULL, NULL, 18),
-('Cinta para Kinesiología', 150, 140, '2026-03-10', NULL, NULL, 19),
-('Compresas Calientes', 60, 50, '2025-10-01', NULL, NULL, 20),
-('Mascarilla de Oxígeno', 200, 150, '2025-04-05', NULL, NULL, 21),
-('Ventilador Portátil', 15, 12, '2027-12-31', NULL, NULL, 22),
-('Monitor de Signos Vitales', 20, 18, '2028-01-01', NULL, NULL, 23),
-('Catéter Venoso', 250, 230, '2025-06-15', NULL, NULL, 24),
-('Bolsa de Suero Fisiológico', 300, 250, '2025-01-10', 5.00, NULL, 25),
-('Reactivo para Cultivo Bacteriano', 100, 90, '2025-03-15', 2.00, '01:00:00', 26),
-('Reactivo para Biopsia', 50, 45, '2025-05-10', 3.00, '02:00:00', 27),
-('Kit de Prueba de Alergias', 75, 70, '2025-06-01', 4.00, '01:00:00', 28),
-('Kit de Prueba de Leishmania', 40, 35, '2025-08-01', 4.00, NULL, 29),
-('Kit de Prueba de Giardia', 60, 55, '2025-08-10', 5.00, NULL, 30),
-('Estetoscopio', 20, 15, '2027-05-01', NULL, NULL, 31),
-('Termómetro Digital', 30, 28, '2026-10-20', NULL, NULL, 32),
-('Equipo de Presión Arterial', 15, 12, '2026-12-31', NULL, NULL, 33),
-('Alcohol en Gel', 500, 450, '2025-12-01', NULL, NULL, 34),
-('Mascarilla Descartable', 1000, 950, '2024-12-15', NULL, NULL, 35),
-('Desinfectante para Superficies', 300, 250, '2025-02-15', NULL, NULL, 36),
-('Guantes de Nitrilo', 800, 750, '2025-03-20', NULL, NULL, 37),
-('Jabón Antiséptico', 200, 180, '2025-06-30', NULL, NULL, 38),
-('Solución Salina', 100, 90, '2025-01-05', 8.00, NULL, 39),
-('Cubrebocas N95', 150, 140, '2025-08-15', NULL, NULL, 40);
+('Reactivo Hemograma', 80, '2025-01-15', 2.00, '00:30:00', 1),
+('Reactivo Perfil Bioquímico', 180, '2025-02-20', 4.00, '01:00:00', 2),
+('Tubo para Hemograma', 450, '2024-12-01', NULL, NULL, 3),
+('Tubo para Bioquímico', 270, '2025-01-25', NULL, NULL, 4),
+('Contenedor para Urianálisis', 350, '2025-04-10', NULL, NULL, 5),
+('Papel Radiográfico', 200, '2025-05-15', 20.00, NULL, 6),
+('Gel para Ultrasonido', 90, '2025-07-01', 15.00, NULL, 7),
+('Líquido de Contraste', 40, '2025-03-05', 8.00, '01:30:00', 8),
+('Lentes de Protección', 120, '2026-01-01', NULL, NULL, 9),
+('Protector de Plomo', 18, '2027-12-01', NULL, NULL, 10),
+('Guantes Quirúrgicos', 900, '2024-11-20', NULL, NULL, 11),
+('Gasa Estéril', 700, '2025-06-15', NULL, NULL, 12),
+('Sutura Absorbible', 250, '2025-08-10', NULL, '02:00:00', 13),
+('Anestésico General', 50, '2025-09-01', 5.00, '00:30:00', 14),
+('Antibiótico Intravenoso', 130, '2025-02-25', 4.00, NULL, 15),
+('Banda Elástica', 85, '2025-07-15', NULL, NULL, 16),
+('Gel Antiinflamatorio', 180, '2025-06-30', 22.00, NULL, 17),
+('Electrodos', 100, '2025-08-20', NULL, NULL, 18),
+('Cinta para Kinesiología', 140, '2026-03-10', NULL, NULL, 19),
+('Compresas Calientes', 50, '2025-10-01', NULL, NULL, 20),
+('Mascarilla de Oxígeno', 150, '2025-04-05', NULL, NULL, 21),
+('Ventilador Portátil', 12, '2027-12-31', NULL, NULL, 22),
+('Monitor de Signos Vitales', 18, '2028-01-01', NULL, NULL, 23),
+('Catéter Venoso', 230, '2025-06-15', NULL, NULL, 24),
+('Bolsa de Suero Fisiológico', 250, '2025-01-10', 5.00, NULL, 25),
+('Reactivo para Cultivo Bacteriano', 90, '2025-03-15', 2.00, '01:00:00', 26),
+('Reactivo para Biopsia', 45, '2025-05-10', 3.00, '02:00:00', 27),
+('Kit de Prueba de Alergias', 70, '2025-06-01', 4.00, '01:00:00', 28),
+('Kit de Prueba de Leishmania', 35, '2025-08-01', 4.00, NULL, 29),
+('Kit de Prueba de Giardia', 55, '2025-08-10', 5.00, NULL, 30),
+('Estetoscopio', 15, '2027-05-01', NULL, NULL, 31),
+('Termómetro Digital', 28, '2026-10-20', NULL, NULL, 32),
+('Equipo de Presión Arterial', 12, '2026-12-31', NULL, NULL, 33),
+('Alcohol en Gel', 450, '2025-12-01', NULL, NULL, 34),
+('Mascarilla Descartable', 950, '2024-12-15', NULL, NULL, 35),
+('Desinfectante para Superficies', 250, '2025-02-15', NULL, NULL, 36),
+('Guantes de Nitrilo', 750, '2025-03-20', NULL, NULL, 37),
+('Jabón Antiséptico', 180, '2025-06-30', NULL, NULL, 38),
+('Solución Salina', 90, '2025-01-05', 8.00, NULL, 39),
+('Cubrebocas N95', 140, '2025-08-15', NULL, NULL, 40);
 
 -- REGISTROS DE USOS DE LOS INSUMOS DURANTE LOS SERVICIOS PRESTADOS EN LAS ATENCIONES MEDICAS
-INSERT INTO UsoInsumo (fecha_registro, cantidad_usada, cantidad_restante, id_insumo, id_atencionmedica_serviciomedico)
+INSERT INTO UsoInsumo (fecha_registro, cantidad_usada, id_insumo, id_atencionmedica_serviciomedico)
 VALUES
-('2024-10-01', 5, 95, 1, 1),  
-('2024-10-02', 10, 140, 2, 2), 
-('2024-10-03', 8, 42, 3, 3),   
-('2024-10-04', 15, 130, 4, 4), 
-('2024-10-05', 25, 175, 5, 6),  
-('2024-10-06', 12, 68, 6, 7),   
-('2024-10-07', 5, 30, 7, 8),   
-('2024-10-08', 20, 90, 8, 9),   
-('2024-10-09', 30, 70, 9, 11),  
-('2024-10-10', 50, 450, 10, 12),
-('2024-10-11', 15, 125, 11, 13),
-('2024-10-12', 40, 210, 12, 14),
-('2024-10-13', 20, 80, 13, 15),  
-('2024-10-14', 12, 38, 14, 16), 
-('2024-10-15', 10, 150, 15, 17),
-('2024-10-16', 8, 92, 16, 18),
-('2024-10-17', 5, 75, 17, 19),  
-('2024-10-18', 10, 40, 18, 20), 
-('2024-10-19', 4, 51, 19, 21),  
-('2024-10-20', 15, 70, 20, 22), 
-('2024-10-21', 10, 140, 21, 23), 
-('2024-10-22', 20, 220, 22, 24), 
-('2024-10-23', 30, 100, 23, 25),
-('2024-10-24', 5, 45, 24, 26),  
-('2024-10-25', 8, 92, 25, 27),  
-('2024-10-26', 3, 77, 26, 28),   
-('2024-10-27', 2, 48, 27, 29),   
-('2024-10-28', 7, 83, 28, 30),   
-('2024-10-29', 20, 130, 29, 31), 
-('2024-10-30', 15, 230, 30, 32), 
-('2024-10-31', 5, 195, 31, 33), 
-('2024-11-01', 3, 24, 32, 34),  
-('2024-11-02', 20, 120, 33, 35), 
-('2024-11-03', 2, 13, 34, 36),   
-('2024-11-04', 1, 97, 35, 37), 
-('2024-11-05', 10, 390, 36, 38), 
-('2024-11-06', 25, 200, 37, 39), 
-('2024-11-07', 15, 210, 38, 40),
-('2024-11-08', 10, 70, 13, 15),
-('2024-11-09', 5, 45, 18, 20);
+('2024-10-01', 5, 1, 1),  
+('2024-10-02', 10, 2, 2), 
+('2024-10-03', 8, 3, 3),   
+('2024-10-04', 15, 4, 4), 
+('2024-10-05', 25, 5, 6),  
+('2024-10-06', 12, 6, 7),   
+('2024-10-07', 5, 7, 8),   
+('2024-10-08', 20, 8, 9),   
+('2024-10-09', 30, 9, 11),  
+('2024-10-10', 50, 10, 12),
+('2024-10-11', 15, 11, 13),
+('2024-10-12', 40, 12, 14),
+('2024-10-13', 20, 13, 15),  
+('2024-10-14', 12, 14, 16), 
+('2024-10-15', 10, 15, 17),
+('2024-10-16', 8, 16, 18),
+('2024-10-17', 5, 17, 19),  
+('2024-10-18', 10, 18, 20), 
+('2024-10-19', 4, 19, 21),  
+('2024-10-20', 15, 20, 22), 
+('2024-10-21', 10, 21, 23), 
+('2024-10-22', 20, 22, 24), 
+('2024-10-23', 30, 23, 25),
+('2024-10-24', 5, 24, 26),  
+('2024-10-25', 8, 25, 27),  
+('2024-10-26', 3, 26, 28),   
+('2024-10-27', 2, 27, 29),   
+('2024-10-28', 7, 28, 30),   
+('2024-10-29', 20, 29, 31), 
+('2024-10-30', 15, 30, 32), 
+('2024-10-31', 5, 31, 33), 
+('2024-11-01', 3, 32, 34),  
+('2024-11-02', 20, 33, 35), 
+('2024-11-03', 2, 34, 36),   
+('2024-11-04', 1, 35, 37), 
+('2024-11-05', 10, 36, 38), 
+('2024-11-06', 25, 37, 39), 
+('2024-11-07', 15, 38, 40),
+('2024-11-08', 10, 13, 15),
+('2024-11-09', 5, 18, 20);
 
--- REGISTROS DE PROCEDIMIENTOS REALIZADOS DURANTE LAS 
--- Inserción de registros en Procedimiento con descripción
+-- REGISTROS DE PROCEDIMIENTOS REALIZADOS DURANTE LOS SERVICIOS DE LAS ATENCIONES
 INSERT INTO Procedimiento (fecha_programada, lugar, descripcion, id_atencionmedica_serviciomedico)
 VALUES
 ('2024-11-05', 'Sala de Consultas', 'Consulta general y chequeo físico.', 1),
